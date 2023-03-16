@@ -14,6 +14,8 @@ function MovieForm() {
     female_director: false,
   });
 
+  const [errors, setErrors] = useState([]);
+
   function handleSubmit(e) {
     e.preventDefault();
     fetch("/movies", {
@@ -23,8 +25,15 @@ function MovieForm() {
       },
       body: JSON.stringify(formData),
     })
-      .then((response) => response.json())
-      .then((newMovie) => console.log(newMovie));
+      .then((response) => {
+        if(response.ok) {
+          response.json().then((newMovie) => console.log(newMovie))
+        } else {
+          response.json().then((errorData) => setErrors(errorData.errors))
+        }
+        //response.json()
+      })
+      //.then((newMovie) => console.log(newMovie));
   }
 
   function handleChange(e) {
@@ -53,7 +62,7 @@ function MovieForm() {
           <input
             type="number"
             id="year"
-            min="1888"
+            min="1223"
             max={new Date().getFullYear()}
             value={formData.year}
             onChange={handleChange}
@@ -125,6 +134,17 @@ function MovieForm() {
             />
           </label>
         </FormGroup>
+        {
+          errors.length > 0 && (
+            <ul style={{color: "red"}}>
+              {
+                errors.map((error) => (
+                  <li key={error}>{error}</li>
+                ))
+              }
+            </ul>
+          )
+        }
         <SubmitButton type="submit">Add Movie</SubmitButton>
       </form>
     </Wrapper>
